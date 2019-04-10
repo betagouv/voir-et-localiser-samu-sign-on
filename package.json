@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/betagouv/voir-et-localiser-samu-sign-on/issues"
   },
-  "homepage": "https://github.com/betagouv/voir-et-localiser-samu-sign-on#readme"
+  "homepage": "https://github.com/betagouv/voir-et-localiser-samu-sign-on#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
 }
