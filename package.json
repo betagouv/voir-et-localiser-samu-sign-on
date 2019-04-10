@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/betagouv/voir-et-localiser-samu-sign-on#readme",
   "dependencies": {
+    "body-parser": "^1.18.3",
     "consolidate": "^0.15.1",
     "express": "^4.16.4",
     "mustache": "^3.0.1",
