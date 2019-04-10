@@ -1,15 +1,15 @@
-var mustache = require('consolidate').mustache
-var express = require('express')
-var app = express()
+const { mustache } = require('consolidate');
+const express = require('express');
 
-var port = 10101
+const app = express();
+const port = 10101;
 
-app.engine('html', mustache)
-app.set('view engine', 'html')
-app.listen(port, function () {
-    console.log('Server listening on port %d', port)
-})
+app.engine('html', mustache);
+app.set('view engine', 'html');
+app.listen(port, () => {
+  console.log('Server listening on port %d', port);
+});
 
-app.get("/", function(req, res) {
-  res.render('index')
-})
+app.get('/', (req, res) => {
+  res.render('index');
+});
