@@ -7,7 +7,8 @@ const schema = {
   firstName: Sequelize.STRING,
   role: Sequelize.STRING,
   unit: Sequelize.STRING,
-  departement: Sequelize.STRING,
+  department: Sequelize.STRING,
+  validated_by_user_id: Sequelize.INTEGER,
   hasSuperpower: { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false },
 };
 

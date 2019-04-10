@@ -30,6 +30,7 @@
 <p class="warning">{{error}}</p>
 {{/error}}
 
+<h2>Connexion</h2>
 <form method="post">
   <div>
     <label for="username">Email&nbsp;:</label>
@@ -40,4 +41,43 @@
     <input id="password" name="password" type="password">
   </div>
   <button type="submit">Se connecter</button>
+</form>
+
+<h2>Création de compte</h2>
+<form action="/user/create" method="post">
+  <div>
+    <label for="newEmail">Email&nbsp;:</label>
+    <input id="newEmail" name="newEmail">
+  </div>
+  <div>
+    <label for="newPassword">Mot de passe&nbsp;:</label>
+    <input id="newPassword" name="newPassword" type="newPassword">
+  </div>
+
+  <div>
+    <label for="lastName">Nom de famille :</label>
+    <input id="lastName" name="lastName" type="lastName">
+  </div>
+
+  <div>
+    <label for="firstName">Prénom :</label>
+    <input id="firstName" name="firstName" type="firstName">
+  </div>
+
+  <div>
+    <label for="role">Rôle :</label>
+    <input id="role" name="role" type="role">
+  </div>
+
+  <div>
+    <label for="unit">Unité :</label>
+    <input id="unit" name="unit" type="unit">
+  </div>
+
+  <div>
+    <label for="department">Départment :</label>
+    <input id="department" name="department" type="department">
+  </div>
+
+  <button type="submit">Créer un compte</button>
 </form>
