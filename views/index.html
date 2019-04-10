@@ -1,1 +1,43 @@
-<h1>Bienvenu</h1>
+<h1>Bienvenue</h1>
+
+<style type="text/css">
+  /* From https://jrl.ninja/etc/1/ */
+  body {
+    max-width: 20rem;
+    padding: 2rem;
+    margin: auto;
+  }
+
+  .warning {
+    padding: 0.2em;
+    background-color: #ffbb78
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  form > * {
+    display: flex;
+    flex-direction: column;
+    padding: 0.2em;
+  }
+</style>
+
+{{#error}}
+<p class="warning">{{error}}</p>
+{{/error}}
+
+<form method="post">
+  <div>
+    <label for="username">Email&nbsp;:</label>
+    <input id="username" name="username">
+  </div>
+  <div>
+    <label for="password">Mot de passe&nbsp;:</label>
+    <input id="password" name="password" type="password">
+  </div>
+  <button type="submit">Se connecter</button>
+</form>
