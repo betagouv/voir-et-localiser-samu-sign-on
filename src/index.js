@@ -20,10 +20,28 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 
+app.post('/', validateUser, (req, res) => {
+  res.json(req.user);
+});
+
 app.get('/users', (req, res) => {
   User.findAll().then(users => res.render('users/list', { users }));
 });
 
-app.post('/', validateUser, (req, res) => {
-  res.json(req.user);
+app.get('/users/new', (req, res) => {
+  res.render('users/new');
+});
+
+app.post('/users/new', (req, res) => {
+  User.create({
+    email: req.body.email,
+    password: req.body.password,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+  }).then(u => {
+    res.redirect('/users');
+  }).catch(e => {
+    console.log(e);
+    res.render('users/new', { error: e });
+  });
 });
