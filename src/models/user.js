@@ -1,8 +1,17 @@
 const Sequelize = require('sequelize');
+const crypto = require('../crypto');
 
 const schema = {
-  email: Sequelize.STRING,
-  password: Sequelize.STRING,
+  email: {
+    type: Sequelize.STRING,
+    unique: true,
+  },
+  password: {
+    type: Sequelize.STRING.BINARY,
+    set(value) {
+      this.setDataValue('password', crypto.pbkdf2Sync(value));
+    },
+  },
   lastName: Sequelize.STRING,
   firstName: Sequelize.STRING,
   role: Sequelize.STRING,
