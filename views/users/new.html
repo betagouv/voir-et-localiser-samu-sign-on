@@ -1,0 +1,51 @@
+<h1>Bienvenue</h1>
+
+<style type="text/css">
+  /* From https://jrl.ninja/etc/1/ */
+  body {
+    max-width: 20rem;
+    padding: 2rem;
+    margin: auto;
+  }
+
+  .warning {
+    padding: 0.2em;
+    background-color: #ffbb78
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  form > * {
+    display: flex;
+    flex-direction: column;
+    padding: 0.2em;
+  }
+</style>
+
+{{#error}}
+<p class="warning">{{error}}</p>
+{{/error}}
+
+<form method="post">
+  <div>
+    <label for="email">Email&nbsp;:</label>
+    <input id="email" name="email">
+  </div>
+  <div>
+    <label for="password">Mot de passe&nbsp;:</label>
+    <input id="password" name="password" type="password">
+  </div>
+  <div>
+    <label for="firstName">Prénom&nbsp;:</label>
+    <input id="firstName" name="firstName">
+  </div>
+  <div>
+    <label for="lastName">Nom&nbsp;:</label>
+    <input id="lastName" name="lastName">
+  </div>
+  <button type="submit">Créer un compte</button>
+</form>

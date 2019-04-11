@@ -21,7 +21,10 @@ app.get('/', (req, res) => {
 });
 
 app.post('/', validateUser, (req, res) => {
-  res.json(req.user);
+  if (req.query.redirect_uri) {
+    return res.redirect(req.query.redirect_uri);
+  }
+  res.json({ login: 'ok', userId: req.user.id });
 });
 
 app.get('/users', (req, res) => {
