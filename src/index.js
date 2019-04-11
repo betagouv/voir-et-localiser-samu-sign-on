@@ -28,8 +28,7 @@ function validateUser(req, res, next) {
     }
 
     next();
-  })
-
+  });
 }
 
 app.post('/', validateUser, (req, res) => {
