@@ -24,7 +24,7 @@ const schema = {
   },
   role: Sequelize.STRING,
   unit: Sequelize.STRING,
-  departement: Sequelize.STRING,
+  department: Sequelize.STRING,
   isValidator: { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false },
 };
 
