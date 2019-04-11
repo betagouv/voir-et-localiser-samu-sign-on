@@ -31,6 +31,10 @@ function validateUser(req, res, next) {
   });
 }
 
+app.get('/users', (req, res) => {
+  User.findAll().then(users => res.render('users/list', { users }))
+});
+
 app.post('/', validateUser, (req, res) => {
   res.json(req.body);
 });
