@@ -3,6 +3,7 @@ const env = process.env.NODE_ENV || 'development';
 const all = {
   env,
   passwordSalt: process.env.PASSWORD_SALT || 'salty',
+  cookieSecret: process.env.COOKIE_SECRET || 'honey',
 };
 
 try {
