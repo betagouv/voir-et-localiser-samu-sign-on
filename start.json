@@ -1,0 +1,7 @@
+{
+  "name" : "voir-et-localiser-sso",
+  "script" : "src/index.js",
+  "env_production" : {
+    "NODE_ENV": "production"
+  }
+}
