@@ -28,8 +28,10 @@ function attachSessionUser(req, res, next) {
     where: {
       id: req.signedCookies.user,
     },
-  }).then(u => req.user = u)
-    .then(() => next());
+  }).then((u) => {
+    req.user = u;
+    next();
+  });
 }
 
 function redirectUser(req, res, next) {
