@@ -25,7 +25,9 @@ function attachSessionUser(req, res, next) {
   }
 
   return User.findOne({
-    id: req.signedCookies.user,
+    where: {
+      id: req.signedCookies.user,
+    },
   }).then((u) => {
     req.user = u;
     next();
