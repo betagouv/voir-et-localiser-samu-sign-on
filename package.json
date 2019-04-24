@@ -4,8 +4,8 @@
   "description": "Brique d'authentification de Voir & Localiser",
   "main": "src/index.js",
   "scripts": {
-    "test:lint": "eslint src/**/*.js && exit 1",
-    "test": "npm run test:lint",
+    "test:lint": "eslint src",
+    "test": "npm run test:lint && exit 1",
     "dev": "pm2-dev start.json"
   },
   "repository": {
