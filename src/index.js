@@ -111,6 +111,10 @@ app.get('/api/userinfo', getToken, (req, res) => {
     },
     attributes: { exclude: ['password'] },
   }).then((user) => {
-    res.json(user);
+    if (user.isValidator || user.ValidatorId) {
+      return res.json(user);
+    }
+
+    return res.status(401).send({ error: 'validation required' });
   });
 });
