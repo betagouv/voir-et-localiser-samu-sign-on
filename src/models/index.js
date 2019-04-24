@@ -5,10 +5,12 @@ const sequelize = new Sequelize({
   storage: 'test.sqlite',
 });
 
+const Code = require('./code')(sequelize);
 const User = require('./user')(sequelize);
 
 sequelize.sync();
 module.exports = {
   sequelize,
+  Code,
   User,
 };
