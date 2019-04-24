@@ -1,6 +1,7 @@
 {
   "name" : "voir-et-localiser-sso",
   "script" : "src/index.js",
+  "ignore_watch": ["node_modules", "database.sqlite"],
   "env_production" : {
     "NODE_ENV": "production"
   }
