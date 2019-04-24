@@ -1,12 +1,15 @@
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const express = require('express');
 const { mustache } = require('consolidate');
+const { cookieSecret } = require('./config');
 
 const { User } = require('./models');
 const { validateUser } = require('./middlewares/auth');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser(cookieSecret));
 
 const port = 10101;
 
@@ -16,16 +19,44 @@ app.listen(port, () => {
   console.log('Server listening on port %d', port); // eslint-disable-line
 });
 
-app.get('/', (req, res) => {
-  res.render('index');
-});
+function attachSessionUser(req, res, next) {
+  if (! req.signedCookies.user) {
+    return next();
+  }
 
-app.post('/', validateUser, (req, res) => {
+  return User.findOne({
+    id: req.signedCookies.user
+  }).then(u => req.user = u)
+    .then(() => next());
+}
+
+function redirectUser(req, res, next) {
+  if (!req.user) {
+    return next();
+  }
+
   if (req.query.redirect_uri) {
     return res.redirect(`${req.query.redirect_uri}?code=${req.user.id}`);
   }
-  res.json({ login: 'ok', userId: req.user.id });
+
+  return res.redirect('users');
+}
+
+function storeUserInSession(req, res, next) {
+  console.log("req.user.id", req.user.id);
+  res.cookie('user', req.user.id, {
+    expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    signed: true
+  });
+  return next();
+}
+
+app.get('/', attachSessionUser, redirectUser, (req, res) => {
+  res.render('index');
 });
+
+app.post('/', validateUser, storeUserInSession, redirectUser);
 
 app.get('/users', (req, res) => {
   User.findAll().then(users => res.render('users/list', { users }));
@@ -35,8 +66,8 @@ app.get('/users/new', (req, res) => {
   res.render('users/new');
 });
 
-app.post('/users/new', (req, res) => {
-  User.create({
+app.post('/users/new', (req, res, next) => {
+  return User.create({
     email: req.body.email,
     password: req.body.password,
     firstName: req.body.firstName,
@@ -44,12 +75,16 @@ app.post('/users/new', (req, res) => {
     role: req.body.role,
     unit: req.body.unit,
     department: req.body.department,
-  }).then((u) => {
-    res.redirect('/users');
-  }).catch((e) => {
+  }).then(user => {
+    req.user = user;
+  }).then(() => {
+    return next();
+  }).catch(e => {
     console.log(e);
-    res.render('users/new', { error: e });
+    return res.render('users/new', { error: e });
   });
+}, storeUserInSession, (req, res) => {
+  return res.redirect('/users');
 });
 
 function getToken(req, res, next) {
