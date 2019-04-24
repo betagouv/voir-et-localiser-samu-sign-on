@@ -20,14 +20,16 @@ app.listen(port, () => {
 });
 
 function attachSessionUser(req, res, next) {
-  if (! req.signedCookies.user) {
+  if (!req.signedCookies.user) {
     return next();
   }
 
   return User.findOne({
-    id: req.signedCookies.user
-  }).then(u => req.user = u)
-    .then(() => next());
+    id: req.signedCookies.user,
+  }).then((u) => {
+    req.user = u;
+    next();
+  });
 }
 
 function redirectUser(req, res, next) {
@@ -43,11 +45,10 @@ function redirectUser(req, res, next) {
 }
 
 function storeUserInSession(req, res, next) {
-  console.log("req.user.id", req.user.id);
   res.cookie('user', req.user.id, {
     expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
     httpOnly: true,
-    signed: true
+    signed: true,
   });
   return next();
 }
@@ -67,7 +68,7 @@ app.get('/users/new', (req, res) => {
 });
 
 app.post('/users/new', (req, res, next) => {
-  return User.create({
+  User.create({
     email: req.body.email,
     password: req.body.password,
     firstName: req.body.firstName,
@@ -75,16 +76,15 @@ app.post('/users/new', (req, res, next) => {
     role: req.body.role,
     unit: req.body.unit,
     department: req.body.department,
-  }).then(user => {
+  }).then((user) => {
     req.user = user;
   }).then(() => {
-    return next();
-  }).catch(e => {
-    console.log(e);
-    return res.render('users/new', { error: e });
+    next();
+  }).catch((e) => {
+    res.render('users/new', { error: e });
   });
 }, storeUserInSession, (req, res) => {
-  return res.redirect('/users');
+  res.redirect('/users');
 });
 
 function getToken(req, res, next) {
