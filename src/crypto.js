@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const { passwordSalt } = require('./config');
+
 const iterations = 100000;
 const keylen = 64;
 const digest = 'sha512';
