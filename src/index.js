@@ -102,6 +102,18 @@ app.post('/users/new', (req, res, next) => {
   res.redirect('/users');
 });
 
+app.get('/users/validate', (req, res) => {
+  User.findAll().then(users => res.render('users/validate', { users }));
+});
+
+app.get('/users/validate/:id', (req, res) => {
+  User.findAll().then(users => res.render('users/validate', { users }));
+});
+
+app.post('/users/validate/{id}', (req, res) => {
+  res.redirect('/users/validate');
+});
+
 function getToken(req, res, next) {
   const header = req.get('Authorization');
   if (!header) {
