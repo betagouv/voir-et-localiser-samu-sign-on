@@ -1,3 +1,4 @@
+const util = require('util');
 const crypto = require('crypto');
 const { passwordSalt } = require('./config');
 
@@ -13,7 +14,10 @@ function pbkdf2Sync(password) {
   return crypto.pbkdf2Sync(password, passwordSalt, iterations, keylen, digest);
 }
 
+const randomBytes = util.promisify(crypto.randomBytes);
+
 module.exports = {
   pbkdf2,
   pbkdf2Sync,
+  randomBytes,
 };

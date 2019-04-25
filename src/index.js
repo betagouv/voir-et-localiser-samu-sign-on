@@ -3,7 +3,8 @@ const cookieParser = require('cookie-parser');
 const express = require('express');
 const { cookieSecret } = require('./config');
 
-const { User } = require('./models');
+const { Code, User, sequelize } = require('./models');
+
 const { validateUser } = require('./middlewares/auth');
 
 const app = express();
@@ -13,8 +14,10 @@ app.use(cookieParser(cookieSecret));
 const port = 10101;
 
 app.set('view engine', 'ejs');
-app.listen(port, () => {
-  console.log('Server listening on port %d', port); // eslint-disable-line
+sequelize.sync().then(() => {
+  app.listen(port, () => {
+    console.log('Server listening on port %d', port); // eslint-disable-line
+  });
 });
 
 function attachSessionUser(req, res, next) {
@@ -38,7 +41,9 @@ function redirectUser(req, res, next) {
   }
 
   if (req.query.redirect_uri) {
-    return res.redirect(`${req.query.redirect_uri}?code=${req.user.id}`);
+    return Code.create({ userId: req.user.id }).then((code) => {
+      res.redirect(`${req.query.redirect_uri}?code=${code.id}`);
+    });
   }
 
   return res.redirect('users');

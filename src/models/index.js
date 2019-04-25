@@ -5,10 +5,26 @@ const sequelize = new Sequelize({
   storage: 'database.sqlite',
 });
 
-const User = require('./user')(sequelize);
+const codeModel = require('./code');
+const userModel = require('./user');
 
-sequelize.sync();
-module.exports = {
+const Code = codeModel(sequelize);
+const User = userModel(sequelize);
+const db = {
   sequelize,
+  Code,
   User,
 };
+
+const models = [
+  codeModel,
+  userModel,
+];
+
+models.forEach((m) => {
+  if (m.addAssociations) {
+    m.addAssociations(db);
+  }
+});
+
+module.exports = db;

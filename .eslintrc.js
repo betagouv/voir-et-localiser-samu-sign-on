@@ -13,5 +13,6 @@ module.exports = {
     ecmaVersion: 2018,
   },
   rules: {
+    //"consistent-return": 0, // This allows early returns
   },
 };
