@@ -8,6 +8,7 @@ const { Code, User, sequelize } = require('./models');
 const { validateUser } = require('./middlewares/auth');
 
 const app = express();
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser(cookieSecret));
 
@@ -94,30 +95,60 @@ app.post('/users/new', (req, res, next) => {
 
 function getToken(req, res, next) {
   const header = req.get('Authorization');
-  if (!header/* missing token */) {
-    return res.json({ error: 'missing token' });
+  if (!header) {
+    return res.json({ error: 'Entête d’authentification manquant' });
   }
 
-  const code = parseInt(header.replace('Bearer', ''), 10);
-  if (code.isNaN) {
-    return res.json({ error: 'unvalid token' });
+  if (!header.startsWith('Bearer: ')) {
+    return res.json({ error: 'Entête d’authentification invalide' });
   }
 
-  req.token = code;
+  req.token = header.slice('Bearer: '.length);
   return next();
 }
 
 app.get('/api/userinfo', getToken, (req, res) => {
-  User.findOne({
+  Code.findOne({
     where: {
-      id: req.token,
+      id: Buffer.from(req.token, 'base64'),
     },
-    attributes: { exclude: ['password'] },
-  }).then((user) => {
-    if (user.isValidator || user.ValidatorId) {
-      return res.json(user);
+  }).then((token) => {
+    if (!token) {
+      return res.status(404).send({ error: 'Token inconnu' });
     }
 
-    return res.status(401).send({ error: 'validation required' });
+    return User.findOne({
+      where: {
+        id: token.userId,
+      },
+      attributes: { exclude: ['password'] },
+    }).then((user) => {
+      if (user.isValidator || user.ValidatorId) {
+        return res.json(user);
+      }
+
+      return res.status(401).send({ error: 'Validation nécessaire' });
+    });
+  });
+});
+
+
+app.post('/api/access_token', (req, res) => {
+  if (!req.body.code) {
+    return res.status(404).send({ error: 'Code manquant' });
+  }
+
+  Code.findOne({
+    where: {
+      id: Buffer.from(req.body.code, 'base64'),
+    },
+  }).then((code) => {
+    if (!code) {
+      return res.status(404).send({ error: 'Code inconnu' });
+    }
+
+    res.send({
+      access_token: code.id,
+    });
   });
 });

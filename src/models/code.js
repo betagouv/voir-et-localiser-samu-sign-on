@@ -21,13 +21,12 @@ function createModel(sequelize) {
       // This is a workaround.
       // cf. https://github.com/sequelize/sequelize/issues/4569
       beforeValidate: (code) => {
-        const id = code.getDataValue('id'); 
-        if (id) {
-          return id;
+        if (code.getDataValue('id')) {
+          return;
         }
 
         return randomBytes(40).then((bytes) => {
-          return code.setDataValue('id', bytes);
+          code.setDataValue('id', bytes);
         });
       },
     },
