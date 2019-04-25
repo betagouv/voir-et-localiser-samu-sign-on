@@ -26,9 +26,9 @@
   }
 </style>
 
-{{#error}}
-<p class="warning">{{error}}</p>
-{{/error}}
+<% if(locals.error) { %>
+  <p class="warning"><%= error %></p>
+<% } %>
 
 <form method="post">
   <div>

@@ -1,7 +1,6 @@
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const express = require('express');
-const { mustache } = require('consolidate');
 const { cookieSecret } = require('./config');
 
 const { User } = require('./models');
@@ -13,8 +12,7 @@ app.use(cookieParser(cookieSecret));
 
 const port = 10101;
 
-app.engine('html', mustache);
-app.set('view engine', 'html');
+app.set('view engine', 'ejs');
 app.listen(port, () => {
   console.log('Server listening on port %d', port); // eslint-disable-line
 });
