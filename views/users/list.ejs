@@ -1,0 +1,23 @@
+<h2>Les utilisateurs de la plateforme</h2>
+
+<table>
+    <tr>
+      <th>id</th>
+      <th>firstName</th>
+      <th>lastName</th>
+      <th>role</th>
+      <th>unit</th>
+      <th>department</th>
+    </tr>
+
+  <% users.forEach(function(user){ %>
+    <tr>
+      <td><%= user.id %></td>
+      <td><%= user.firstName %></td>
+      <td><%= user.lastName %></td>
+      <td><%= user.role %></td>
+      <td><%= user.unit %></td>
+      <td><%= user.department %></td>
+    </tr>
+  <% }); %>
+</table>
