@@ -74,9 +74,7 @@ app.get('/users', (req, res) => {
   User.findAll().then(users => res.render('users/list', { users }));
 });
 
-app.post('/users', logout, redirectUser, (req, res) => {
-  return res.status(200).redirect('/');
-});
+app.post('/users', logout, redirectUser, (req, res) => res.status(200).redirect('/'));
 
 app.get('/users/new', (req, res) => {
   res.render('users/new');
