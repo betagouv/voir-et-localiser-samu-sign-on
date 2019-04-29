@@ -4,6 +4,10 @@ const all = {
   env,
   passwordSalt: process.env.PASSWORD_SALT || 'salty',
   cookieSecret: process.env.COOKIE_SECRET || 'honey',
+  database: {
+    dialect: 'sqlite',
+    storage: process.env.DATABASE_SQLITE_FILE || 'database.sqlite',
+  }
 };
 
 try {
