@@ -29,9 +29,15 @@ const schema = {
 };
 
 function createModel(sequelize) {
-  const User = sequelize.define('user', schema);
-  User.hasOne(User, { as: 'Validator' });
-  return User;
+  return sequelize.define('user', schema, {
+    paranoid: true,
+  });
 }
+
+function addAssociations(db) {
+  db.User.hasOne(db.User, { as: 'Validator' });
+}
+
+createModel.addAssociations = addAssociations;
 
 module.exports = createModel;
