@@ -1,6 +1,10 @@
-<%- include('../includes/header', { user: locals.user }) %>
+<%- include('../includes/header', { loggedInUser }) %>
 
-<h2>Les utilisateurs de la plateforme</h2>
+<h2>Les utilisateurs de la plateforme
+    <% if (loggedInUser) { %>
+        <% if (loggedInUser.isValidator) { %>, en attente de validation<% } %>
+    <% } %>
+</h2>
 
 <table>
     <tr>
@@ -10,16 +14,65 @@
       <th>role</th>
       <th>unit</th>
       <th>department</th>
+        <% if (loggedInUser) { %>
+            <% if (loggedInUser.isValidator && loggedInUser.ValidatorId) { %>
+                <th>validation</th>
+            <% } %>
+        <% } %>
     </tr>
 
   <% users.forEach(function(user){ %>
-    <tr>
-      <td><%= user.id %></td>
-      <td><%= user.firstName %></td>
-      <td><%= user.lastName %></td>
-      <td><%= user.role %></td>
-      <td><%= user.unit %></td>
-      <td><%= user.department %></td>
-    </tr>
+            <tr>
+                <% if (!user.isValidator && !user.ValidatorId) { %>
+                    <td><%= user.id %></td>
+                    <td><%= user.firstName %></td>
+                    <td><%= user.lastName %></td>
+                    <td><%= user.role %></td>
+                    <td><%= user.unit %></td>
+                    <td><%= user.department %></td>
+
+                    <% if (loggedInUser) { %>
+                        <% if (loggedInUser.isValidator && loggedInUser.ValidatorId) { %>
+                            <td>
+                                <form method="post" action="/users/validate/<%= user.id %>">
+                                    <button>Valider</button>
+                                </form>
+                            </td>
+                        <% } %>
+                    <% } %>
+                <% } %>
+            </tr>
   <% }); %>
 </table>
+
+<% if (loggedInUser) { %>
+    <% if (loggedInUser.isValidator) { %>
+        <h2>Les utilisateurs de la plateforme validés</h2>
+
+        <table>
+            <tr>
+                <th>id</th>
+                <th>firstName</th>
+                <th>lastName</th>
+                <th>role</th>
+                <th>unit</th>
+                <th>department</th>
+                <th>validation</th>
+            </tr>
+
+            <% users.forEach(function(user){ %>
+                <% if (user.isValidator  || user.ValidatorId) { %>
+                    <tr>
+                        <td><%= user.id %></td>
+                        <td><%= user.firstName %></td>
+                        <td><%= user.lastName %></td>
+                        <td><%= user.role %></td>
+                        <td><%= user.unit %></td>
+                        <td><%= user.department %></td>
+                        <td><%= user.updatedAt %></td>
+                    </tr>
+                <% } %>
+            <% }); %>
+        </table>
+    <% } %>
+<% } %>
