@@ -59,14 +59,23 @@ function storeUserInSession(req, res, next) {
   return next();
 }
 
+function logout(req, res, next) {
+  res.clearCookie('user');
+  return next();
+}
+
 app.get('/', attachSessionUser, redirectUser, (req, res) => {
   res.render('index');
 });
 
 app.post('/', validateUser, storeUserInSession, redirectUser);
 
-app.get('/users', (req, res) => {
-  User.findAll().then(users => res.render('users/list', { users }));
+app.get('/users', attachSessionUser, (req, res) => {
+  User.findAll().then(users => res.render('users/list', { users, user: req.user }));
+});
+
+app.post('/logout', logout, (req, res) => {
+  res.redirect('/');
 });
 
 app.get('/users/new', (req, res) => {
