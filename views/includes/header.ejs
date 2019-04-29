@@ -1,0 +1,33 @@
+<nav>
+    <ul>
+        <li>Accueil</li>
+        <li>Utilisateurs</li>
+        <% if (locals.user) { %>
+        <li class="user">
+            <li class="user">Vous êtes connecté(e) en tant que <%= user.firstName %> <%= user.lastName %></li>
+            <li>
+                <form method="post" action="/logout">
+                    <button>Se déconnecter</button>
+                </form>
+            </li>
+        </li>
+        <% } %>
+    </ul>
+</nav>
+
+<style type="text/css">
+    nav ul {
+        list-style: none;
+        display: inline-block;
+        width: 100vw;
+    }
+
+    nav li {
+        display: inline-block;
+        padding: 1vw;
+    }
+
+    .user {
+        margin-left: 15vw;
+    }
+</style>
