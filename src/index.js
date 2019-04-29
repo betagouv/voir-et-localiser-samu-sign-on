@@ -71,7 +71,7 @@ app.get('/', attachSessionUser, redirectUser, (req, res) => {
 app.post('/', validateUser, storeUserInSession, redirectUser);
 
 app.get('/users', attachSessionUser, (req, res) => {
-  User.findAll().then(users => res.render('users/list', { users, user: req.user }));
+  User.findAll().then(users => res.render('users/list', { users, loggedInUser: req.user }));
 });
 
 app.post('/logout', logout, (req, res) => {
@@ -102,12 +102,8 @@ app.post('/users/new', (req, res, next) => {
   res.redirect('/users');
 });
 
-app.get('/users/validate', (req, res) => {
-  User.findAll().then(users => res.render('users/validate', { users }));
-});
-
 app.get('/users/validate/:id', (req, res) => {
-  User.findAll().then(users => res.render('users/validate', { users }));
+  User.findAll().then(users => res.render('users', { users }));
 });
 
 app.post('/users/validate/:id', (req, res) => {
@@ -119,7 +115,7 @@ app.post('/users/validate/:id', (req, res) => {
     user.update({
       ValidatorId: req.signedCookies.user,
     }).catch(error => res.json(error))
-      .then(() => res.redirect('/users/validate'));
+      .then(() => res.redirect('/users'));
   });
 });
 
