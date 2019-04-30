@@ -121,11 +121,11 @@ function getToken(req, res, next) {
     return res.json({ error: 'Entête d’authentification manquant' });
   }
 
-  if (!header.startsWith('Bearer: ')) {
+  if (!header.startsWith('Bearer ')) {
     return res.json({ error: 'Entête d’authentification invalide' });
   }
 
-  req.token = header.slice('Bearer: '.length);
+  req.token = header.slice('Bearer '.length);
   return next();
 }
 
