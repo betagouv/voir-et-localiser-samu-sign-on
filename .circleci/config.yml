@@ -24,6 +24,7 @@ jobs:
     working_directory: ~/voir-et-localiser-samu-sign-on
     steps:
       - run: |
+          mkdir --parents ~/.ssh
           touch ~/.ssh/known_hosts
           echo '|1|mlL85t89J2gurDbrEZ6KiY/5qw8=|N/r6RUzUY4QM+8HcuPBCZEbpxos= ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBP79yIilaQAMoztXmfjp4SRRV8p2tmjA8B/6NCtzWU4y0Icu50e5zN20pp8X5zRivsDz2ci6XiTGPaAHCYGDfjI=' >> ~/.ssh/known_hosts
           echo '|1|GmMAqn9UNbCDzYY++lc7WMPayF0=|UaTDUhMKImeQbRvzL7IevkceJrI= ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBP79yIilaQAMoztXmfjp4SRRV8p2tmjA8B/6NCtzWU4y0Icu50e5zN20pp8X5zRivsDz2ci6XiTGPaAHCYGDfjI=' >> ~/.ssh/known_hosts
