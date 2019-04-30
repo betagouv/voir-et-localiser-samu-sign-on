@@ -7,7 +7,7 @@ const all = {
   database: {
     dialect: 'sqlite',
     storage: process.env.DATABASE_SQLITE_FILE || 'database.sqlite',
-  }
+  },
 };
 
 try {
