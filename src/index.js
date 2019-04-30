@@ -43,7 +43,7 @@ function redirectUser(req, res, next) {
 
   if (req.query.redirect_uri) {
     return Code.create({ userId: req.user.id }).then((code) => {
-      res.redirect(`${req.query.redirect_uri}?code=${code.id}`);
+      res.redirect(`${req.query.redirect_uri}?code=${encodeURIComponent(code.id)}`);
     });
   }
 
