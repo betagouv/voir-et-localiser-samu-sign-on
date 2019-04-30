@@ -1,10 +1,6 @@
 <%- include('../includes/header', { loggedInUser }) %>
 
-<h2>Les utilisateurs de la plateforme
-    <% if (loggedInUser) { %>
-        <% if (loggedInUser.isValidator) { %>, en attente de validation<% } %>
-    <% } %>
-</h2>
+<h2>Les utilisateurs de la plateforme</h2>
 
 <table>
     <tr>
