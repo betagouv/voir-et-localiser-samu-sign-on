@@ -71,7 +71,7 @@ app.get('/', attachSessionUser, redirectUser, (req, res) => {
 app.post('/', validateUser, storeUserInSession, redirectUser);
 
 app.get('/users', attachSessionUser, (req, res) => {
-  User.findAll().then(users => res.render('users/list', { users, user: req.user }));
+  User.findAll().then(users => res.render('users/list', { users, loggedInUser: req.user }));
 });
 
 app.post('/logout', logout, (req, res) => {
@@ -100,6 +100,19 @@ app.post('/users/new', (req, res, next) => {
   });
 }, storeUserInSession, (req, res) => {
   res.redirect('/users');
+});
+
+app.post('/users/validate/:id', (req, res) => {
+  User.findOne({
+    where: {
+      id: req.params.id,
+    },
+  }).then((user) => {
+    user.update({
+      ValidatorId: req.signedCookies.user,
+    }).catch(error => res.json(error))
+      .then(() => res.redirect('/users'));
+  });
 });
 
 function getToken(req, res, next) {

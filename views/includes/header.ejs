@@ -1,7 +1,7 @@
 <nav>
-    <% if (locals.user) { %>
+    <% if (loggedInUser) { %>
     <ul>
-        <li>Vous êtes connecté(e) en tant que <%= user.firstName %> <%= user.lastName %>.</li>
+        <li>Vous êtes connecté(e) en tant que <%= loggedInUser.firstName %> <%= loggedInUser.lastName %>.</li>
         <li>
             <form method="post" action="/logout">
                 <button>Se déconnecter</button>
