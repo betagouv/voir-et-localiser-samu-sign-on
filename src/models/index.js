@@ -1,9 +1,7 @@
 const Sequelize = require('sequelize');
+const { database } = require('../config');
 
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: 'database.sqlite',
-});
+const sequelize = new Sequelize(database);
 
 const codeModel = require('./code');
 const userModel = require('./user');
