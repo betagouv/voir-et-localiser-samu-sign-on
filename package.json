@@ -6,7 +6,8 @@
   "scripts": {
     "test:lint": "eslint src",
     "test": "npm run test:lint && exit 1",
-    "dev": "pm2-dev start.json"
+    "dev": "pm2-dev start.json",
+    "reload": "pm2 reload voir-et-localiser-sso"
   },
   "repository": {
     "type": "git",
