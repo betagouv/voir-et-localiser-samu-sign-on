@@ -14,29 +14,29 @@
       <th>role</th>
       <th>unit</th>
       <th>department</th>
-        <th>validé par</th>
+      <th>validé par</th>
     </tr>
 
-  <% users.forEach(function(user){ %>
-    <tr>
-        <td><%= user.id %></td>
-        <td><%= user.firstName %></td>
-        <td><%= user.lastName %></td>
-        <td><%= user.role %></td>
-        <td><%= user.unit %></td>
-        <td><%= user.department %></td>
+    <% users.forEach(function(user){ %>
+        <tr>
+            <td><%= user.id %></td>
+            <td><%= user.firstName %></td>
+            <td><%= user.lastName %></td>
+            <td><%= user.role %></td>
+            <td><%= user.unit %></td>
+            <td><%= user.department %></td>
 
-        <% if (loggedInUser
-            && loggedInUser.isValidator
-            && !user.ValidatorId) { %>
-            <td>
-                <form method="post" action="/users/validate/<%= user.id %>">
-                    <button>Valider</button>
-                </form>
-            </td>
-        <% } else {%>
-            <td><%= user.ValidatorId %></td>
-        <% } %>
-    </tr>
-  <% }); %>
+            <% if (loggedInUser
+                && loggedInUser.isValidator
+                && !user.ValidatorId) { %>
+                <td>
+                    <form method="post" action="/users/validate/<%= user.id %>">
+                        <button>Valider</button>
+                    </form>
+                </td>
+            <% } else {%>
+                <td><%= user.ValidatorId %></td>
+            <% } %>
+        </tr>
+    <% }); %>
 </table>

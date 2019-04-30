@@ -102,10 +102,6 @@ app.post('/users/new', (req, res, next) => {
   res.redirect('/users');
 });
 
-app.get('/users/validate/:id', (req, res) => {
-  User.findAll().then(users => res.render('users', { users }));
-});
-
 app.post('/users/validate/:id', (req, res) => {
   User.findOne({
     where: {
