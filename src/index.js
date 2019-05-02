@@ -102,14 +102,25 @@ app.post('/users/new', (req, res, next) => {
   res.redirect('/users');
 });
 
-app.post('/users/validate/:id', (req, res) => {
+app.post('/users/validate/:id', attachSessionUser, (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'Vous devez être connecté.' });
+  }
+
+  if (!req.user.isValidator) {
+    return res.status(401).send({ error: 'Vous devez être validateur.' });
+  }
+
+  return next();
+}, (req, res) => {
   User.findOne({
     where: {
       id: req.params.id,
     },
   }).then((user) => {
     user.update({
-      ValidatorId: req.signedCookies.user,
+      ValidatorId: req.user.id,
+      isValidator: Boolean(req.body.isValidator),
     }).catch(error => res.json(error))
       .then(() => res.redirect('/users'));
   });

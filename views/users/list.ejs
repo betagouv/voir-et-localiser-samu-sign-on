@@ -4,13 +4,18 @@
 
 <table>
     <tr>
-      <th>id</th>
-      <th>firstName</th>
-      <th>lastName</th>
-      <th>role</th>
-      <th>unit</th>
-      <th>department</th>
-      <th>validé par</th>
+        <th>ID</th>
+        <th>Prénom</th>
+        <th>Nom</th>
+        <th>Role</th>
+        <th>Groupe</th>
+        <th>Département</th>
+        <th>Peut valider</th>
+        <% if (loggedInUser
+            && loggedInUser.isValidator) { %>
+            <th>Email</th>
+        <% } %>
+        <th>Validé par</th>
     </tr>
 
     <% users.forEach(function(user){ %>
@@ -21,17 +26,26 @@
             <td><%= user.role %></td>
             <td><%= user.unit %></td>
             <td><%= user.department %></td>
+            <td><%= user.isValidator ? 'Oui' : 'Non' %></td>
 
             <% if (loggedInUser
-                && loggedInUser.isValidator
-                && !user.ValidatorId) { %>
-                <td>
-                    <form method="post" action="/users/validate/<%= user.id %>">
-                        <button>Valider</button>
-                    </form>
-                </td>
-            <% } else {%>
-                <td><%= user.ValidatorId %></td>
+                && loggedInUser.isValidator) { %>
+                <td> user.email </td>
+                <% if (!user.ValidatorId) { %>
+                    <td>
+                        <form method="post" action="/users/validate/<%= user.id %>">
+                            <button>Valider</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="post" action="/users/validate/<%= user.id %>">
+                            <input type="hidden" name="isValidator" value="1">
+                            <button class="warning">Autoriser à valider</button>
+                        </form>
+                    </td>
+                <% } else {%>
+                    <td><%= user.ValidatorId %></td>
+                <% } %>
             <% } %>
         </tr>
     <% }); %>
