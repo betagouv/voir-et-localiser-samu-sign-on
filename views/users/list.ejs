@@ -30,7 +30,7 @@
 
             <% if (loggedInUser
                 && loggedInUser.isValidator) { %>
-                <td> user.email </td>
+                <td><%= user.email %></td>
                 <% if (!user.ValidatorId) { %>
                     <td>
                         <form method="post" action="/users/validate/<%= user.id %>">
