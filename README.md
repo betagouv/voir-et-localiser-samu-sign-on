@@ -9,6 +9,14 @@ npm run dev
 # Aller à http://localhost:10101
 ```
 
+Configuration BDD :
+
+Instruction avec variable
+
+```
+DATABASE_SQLITE_FILE=../db_id_voir_et_localiser.db npm run dev
+```
+
 ## Déploiement
 
 Pour déployer le service en production, il faut lancer :
