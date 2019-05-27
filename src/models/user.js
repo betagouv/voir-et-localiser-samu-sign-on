@@ -26,6 +26,7 @@ const schema = {
   unit: Sequelize.STRING,
   department: Sequelize.STRING,
   isValidator: { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false },
+  emailConfirmationTokenAt: { type: Sequelize.DATE },
 };
 
 function createModel(sequelize) {

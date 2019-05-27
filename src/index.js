@@ -3,7 +3,9 @@ const cookieParser = require('cookie-parser');
 const express = require('express');
 const { cookieSecret } = require('./config');
 
-const { Code, User, sequelize } = require('./models');
+const {
+  Token, Code, User, sequelize,
+} = require('./models');
 
 const { validateUser } = require('./middlewares/auth');
 
@@ -99,7 +101,34 @@ app.post('/users/new', (req, res, next) => {
     res.render('users/new', { error: e });
   });
 }, storeUserInSession, (req, res) => {
-  res.redirect('/users');
+  Token.create({ userId: req.user.id }).then((token) => {
+    res.render('index', {
+      message: 'Un email vous a été envoyé. Merci de consulter votre boîte de réception pour confirmer votre adresse mail.',
+      link: `https://id.voir-et-localiser.beta.gouv.fr/confirm_mail/?token=${token.id}`,
+    });
+  });
+});
+
+app.get('/confirm_mail/', (req, res) => {
+  Token.findOne({
+    where: {
+      id: Buffer.from(req.query.token, 'base64'),
+    },
+  }).then((token) => {
+    if (!token) {
+      return res.status(404).send({ error: 'Token inconnu' });
+    }
+
+    const currentDate = new Date().toISOString();
+    const validDate = `${currentDate.replace('T', ' ').replace('Z', '')} +00:00`;
+    User.update({
+      emailConfirmationTokenAt: new Date(validDate),
+    }, {
+      where: {
+        id: token.userId,
+      },
+    }).then(() => res.redirect('/users'));
+  });
 });
 
 app.post('/users/validate/:id', attachSessionUser, (req, res, next) => {
