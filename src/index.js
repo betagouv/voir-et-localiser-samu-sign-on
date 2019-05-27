@@ -104,7 +104,7 @@ app.post('/users/new', (req, res, next) => {
   Token.create({ userId: req.user.id }).then((token) => {
     res.render('index', {
       message: 'Un email vous a été envoyé. Merci de consulter votre boîte de réception pour confirmer votre adresse mail.',
-      link: `https://id.voir-et-localiser.beta.gouv.fr/confirm_mail/?token=${token.id}`,
+      link: `https://id.voir-et-localiser.beta.gouv.fr/confirm_mail/?token=${encodeURIComponent(token.id)}`,
     });
   });
 });
