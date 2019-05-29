@@ -1,6 +1,11 @@
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const express = require('express');
+const dotenv = require('dotenv');
+
+dotenv.config();
+const mailjet = require('node-mailjet').connect(process.env.MJ_APIKEY_PUBLIC, process.env.MJ_APIKEY_PRIVATE);
+
 const { cookieSecret } = require('./config');
 
 const {
@@ -102,9 +107,43 @@ app.post('/users/new', (req, res, next) => {
   });
 }, storeUserInSession, (req, res) => {
   Token.create({ userId: req.user.id }).then((token) => {
+    const link = `https://id.voir-et-localiser.beta.gouv.fr/confirm_mail/?token=${encodeURIComponent(token.id)}`;
+    const request = mailjet
+      .post('send', { version: 'v3.1' })
+      .request({
+        Messages: [
+          {
+            From: {
+              Email: 'id@voir-et-localiser.beta.gouv.fr',
+              Name: 'Voir et localiser',
+            },
+            To: [
+              {
+                Email: req.user.email,
+                Name: `${req.user.firstName} ${req.user.lastName}`,
+              },
+            ],
+            Variables: {
+              mjLink: `${link}`,
+            },
+            Subject: 'Voir et localiser - Confirmer votre email',
+            TemplateLanguage: true,
+            TextPart: "Bonjour, bienvenue sur la brique d'authentification Voir et localiser ! Vous pouvez, dès à présent, cliquer sur le lien ci-dessus pour vous connecter !",
+            HTMLPart: "<h3>Bonjour, <br>bienvenue sur la brique d'authentification "
+                + "<a id='confirm-mail-link' href='{{var:mjLink}}'>Voir et localiser</a>.</h3><br>Vous pouvez, dès à présent, cliquer sur le lien ci-dessus pour vous connecter !",
+          },
+        ],
+      });
+    request
+      .then((result) => {
+        console.log(result.body);
+      })
+      .catch((err) => {
+        console.error(err.statusCode, err.message);
+      });
+
     res.render('index', {
       message: 'Un email vous a été envoyé. Merci de consulter votre boîte de réception pour confirmer votre adresse mail.',
-      link: `https://id.voir-et-localiser.beta.gouv.fr/confirm_mail/?token=${encodeURIComponent(token.id)}`,
     });
   });
 });
