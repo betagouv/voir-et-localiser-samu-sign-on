@@ -3,6 +3,8 @@ const cookieParser = require('cookie-parser');
 const express = require('express');
 const dotenv = require('dotenv');
 
+const { NODE_ENV } = process.env;
+
 dotenv.config();
 const mailjet = require('node-mailjet').connect(process.env.MJ_APIKEY_PUBLIC, process.env.MJ_APIKEY_PRIVATE);
 
@@ -107,7 +109,12 @@ app.post('/users/new', (req, res, next) => {
   });
 }, storeUserInSession, (req, res) => {
   Token.create({ userId: req.user.id }).then((token) => {
-    const link = `https://id.voir-et-localiser.beta.gouv.fr/confirm_mail/?token=${encodeURIComponent(token.id)}`;
+    let domain = '';
+    // eslint-disable-next-line no-unused-expressions
+    NODE_ENV === 'development' ? domain = process.env.DOMAIN_DEV : domain = process.env.DOMAIN_QUALIF;
+    // eslint-disable-next-line no-unused-expressions
+    NODE_ENV === 'production' ? domain = process.env.DOMAIN_PROD : domain = process.env.DOMAIN_QUALIF;
+    const link = `${domain}/confirm_mail/?token=${encodeURIComponent(token.id)}`;
     const request = mailjet
       .post('send', { version: 'v3.1' })
       .request({
@@ -136,9 +143,11 @@ app.post('/users/new', (req, res, next) => {
       });
     request
       .then((result) => {
+        // eslint-disable-next-line no-console
         console.log(result.body);
       })
       .catch((err) => {
+        // eslint-disable-next-line no-console
         console.error(err.statusCode, err.message);
       });
 
