@@ -17,6 +17,19 @@ Instruction avec variable
 DATABASE_SQLITE_FILE=../db_id_voir_et_localiser.db npm run dev
 ```
 
+Ou variable d'environnement
+
+```
+DATABASE_SQLITE_FILE=../db_id_voir_et_localiser.db
+```
+
+Configuration des variables d'environnement Mail jet
+
+```
+MJ_APIKEY_PUBLIC=xxxxxxxxxxxx
+MJ_APIKEY_PRIVATE=xxxxxxxxxxxx
+```
+
 ## Déploiement
 
 Pour déployer le service en production, il faut lancer :
