@@ -1,5 +1,9 @@
 <%- include('../includes/header', { loggedInUser }) %>
 
+<% if(locals.message) { %>
+    <p class="info"><%= message %></p>
+<% } %>
+
 <h2>Les utilisateurs de la plateforme</h2>
 
 <table>

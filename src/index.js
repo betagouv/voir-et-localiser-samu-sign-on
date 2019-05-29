@@ -1,9 +1,18 @@
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const express = require('express');
+const dotenv = require('dotenv');
+
+const { NODE_ENV } = process.env;
+
+dotenv.config();
+const mailjet = require('node-mailjet').connect(process.env.MJ_APIKEY_PUBLIC, process.env.MJ_APIKEY_PRIVATE);
+
 const { cookieSecret } = require('./config');
 
-const { Code, User, sequelize } = require('./models');
+const {
+  Token, Code, User, sequelize,
+} = require('./models');
 
 const { validateUser } = require('./middlewares/auth');
 
@@ -99,7 +108,75 @@ app.post('/users/new', (req, res, next) => {
     res.render('users/new', { error: e });
   });
 }, storeUserInSession, (req, res) => {
-  res.redirect('/users');
+  Token.create({ userId: req.user.id }).then((token) => {
+    let domain = '';
+    // eslint-disable-next-line no-unused-expressions
+    NODE_ENV === 'development' ? domain = process.env.DOMAIN_DEV : domain = process.env.DOMAIN_QUALIF;
+    // eslint-disable-next-line no-unused-expressions
+    NODE_ENV === 'production' ? domain = process.env.DOMAIN_PROD : domain = process.env.DOMAIN_QUALIF;
+    const link = `${domain}/confirm_mail/?token=${encodeURIComponent(token.id)}`;
+    const request = mailjet
+      .post('send', { version: 'v3.1' })
+      .request({
+        Messages: [
+          {
+            From: {
+              Email: 'id@voir-et-localiser.beta.gouv.fr',
+              Name: 'Voir et localiser',
+            },
+            To: [
+              {
+                Email: req.user.email,
+                Name: `${req.user.firstName} ${req.user.lastName}`,
+              },
+            ],
+            Variables: {
+              mjLink: `${link}`,
+            },
+            Subject: 'Voir et localiser - Confirmer votre email',
+            TemplateLanguage: true,
+            TextPart: "Bonjour, bienvenue sur la brique d'authentification Voir et localiser ! Vous pouvez, dès à présent, cliquer sur le lien ci-dessus pour vous connecter !",
+            HTMLPart: "<h3>Bonjour, <br>bienvenue sur la brique d'authentification "
+                + "<a id='confirm-mail-link' href='{{var:mjLink}}'>Voir et localiser</a>.</h3><br>Vous pouvez, dès à présent, cliquer sur le lien ci-dessus pour vous connecter !",
+          },
+        ],
+      });
+    request
+      .then((result) => {
+        // eslint-disable-next-line no-console
+        console.log(result.body);
+      })
+      .catch((err) => {
+        // eslint-disable-next-line no-console
+        console.error(err.statusCode, err.message);
+      });
+
+    res.render('index', {
+      message: 'Un email vous a été envoyé. Merci de consulter votre boîte de réception pour confirmer votre adresse mail.',
+    });
+  });
+});
+
+app.get('/confirm_mail/', (req, res) => {
+  Token.findOne({
+    where: {
+      id: Buffer.from(req.query.token, 'base64'),
+    },
+  }).then((token) => {
+    if (!token) {
+      return res.status(404).send({ error: 'Token inconnu' });
+    }
+
+    const currentDate = new Date().toISOString();
+    const validDate = `${currentDate.replace('T', ' ').replace('Z', '')} +00:00`;
+    User.update({
+      emailConfirmationTokenAt: new Date(validDate),
+    }, {
+      where: {
+        id: token.userId,
+      },
+    }).then(() => res.redirect('/users'));
+  });
 });
 
 app.post('/users/validate/:id', attachSessionUser, (req, res, next) => {

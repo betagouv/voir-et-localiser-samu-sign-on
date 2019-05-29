@@ -13,6 +13,11 @@
     background-color: #ffbb78
   }
 
+  .info {
+    padding: 0.2em;
+    background-color: #39ffba
+  }
+
   form {
     display: flex;
     flex-direction: column;
@@ -28,6 +33,10 @@
 
 <% if(locals.error) { %>
   <p class="warning"><%= error %></p>
+<% } %>
+
+<% if(locals.message) { %>
+  <p class="info"><%= message %></p>
 <% } %>
 
 <form method="post">

@@ -3,3 +3,4 @@ node_modules/
 production.js
 *.sqlite
 *.sqlite-journal
+.env
