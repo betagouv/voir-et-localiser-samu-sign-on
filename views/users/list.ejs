@@ -1,7 +1,18 @@
 <%- include('../includes/header', { loggedInUser }) %>
 
+<style type="text/css">
+    .info {
+        text-align: center;
+        padding: 0.2em;
+        max-width: 26em;
+        background-color: #39ffba
+    }
+</style>
+
 <% if(locals.message) { %>
-    <p class="info"><%= message %></p>
+    <% if(loggedInUser.ValidatorId === null) { %>
+        <p class="info"><%= message %></p>
+    <% } %>
 <% } %>
 
 <h2>Les utilisateurs de la plateforme</h2>

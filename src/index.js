@@ -54,7 +54,11 @@ function redirectUser(req, res, next) {
     });
   }
 
-  return res.redirect('users');
+  return User.findAll().then(users => res.render('users/list', {
+    users,
+    loggedInUser: req.user,
+    message: 'Votre compte est en attente de validation par un administrateur.',
+  }));
 }
 
 function storeUserInSession(req, res, next) {
