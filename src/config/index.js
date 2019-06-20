@@ -8,6 +8,8 @@ const all = {
     dialect: 'sqlite',
     storage: process.env.DATABASE_SQLITE_FILE || 'database.sqlite',
   },
+
+  domain: process.env.DOMAIN || 'dev.domain',
 };
 
 try {

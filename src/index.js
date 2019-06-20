@@ -3,12 +3,8 @@ const cookieParser = require('cookie-parser');
 const express = require('express');
 const dotenv = require('dotenv');
 
-const { NODE_ENV } = process.env;
-
-dotenv.config();
-const mailjet = require('node-mailjet').connect(process.env.MJ_APIKEY_PUBLIC, process.env.MJ_APIKEY_PRIVATE);
-
-const { cookieSecret } = require('./config');
+const { cookieSecret, mailjet: { publicKey, privateKey}, domain } = require('./config');
+const mailjet = require('node-mailjet').connect(publicKey, privateKey);
 
 const {
   Token, Code, User, sequelize,
@@ -109,12 +105,8 @@ app.post('/users/new', (req, res, next) => {
   });
 }, storeUserInSession, (req, res) => {
   Token.create({ userId: req.user.id }).then((token) => {
-    let domain = '';
-    // eslint-disable-next-line no-unused-expressions
-    NODE_ENV === 'development' ? domain = process.env.DOMAIN_DEV : domain = process.env.DOMAIN_QUALIF;
-    // eslint-disable-next-line no-unused-expressions
-    NODE_ENV === 'production' ? domain = process.env.DOMAIN_PROD : domain = process.env.DOMAIN_QUALIF;
-    const link = `${domain}/confirm_mail/?token=${encodeURIComponent(token.id)}`;
+    return `${domain}/confirm_mail/?token=${encodeURIComponent(token.id)}`;
+  }.then(link => {
     const request = mailjet
       .post('send', { version: 'v3.1' })
       .request({
@@ -140,20 +132,17 @@ app.post('/users/new', (req, res, next) => {
                 + "<a id='confirm-mail-link' href='{{var:mjLink}}'>Voir et localiser</a>.</h3><br>Vous pouvez, dès à présent, cliquer sur le lien ci-dessus pour vous connecter !",
           },
         ],
-      });
-    request
+      })
       .then((result) => {
-        // eslint-disable-next-line no-console
-        console.log(result.body);
+        res.render('index', {
+          message: 'Un email vous a été envoyé. Merci de consulter votre boîte de réception pour confirmer votre adresse mail.',
+        });
       })
       .catch((err) => {
-        // eslint-disable-next-line no-console
-        console.error(err.statusCode, err.message);
+        res.render('index', {
+          message: 'Something went wrong.',
+        });
       });
-
-    res.render('index', {
-      message: 'Un email vous a été envoyé. Merci de consulter votre boîte de réception pour confirmer votre adresse mail.',
-    });
   });
 });
 
@@ -170,7 +159,7 @@ app.get('/confirm_mail/', (req, res) => {
     const currentDate = new Date().toISOString();
     const validDate = `${currentDate.replace('T', ' ').replace('Z', '')} +00:00`;
     User.update({
-      emailConfirmationTokenAt: new Date(validDate),
+      emailConfirmationTokenAt: new Date(),
     }, {
       where: {
         id: token.userId,
