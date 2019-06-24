@@ -8,6 +8,11 @@ const all = {
     dialect: 'sqlite',
     storage: process.env.DATABASE_SQLITE_FILE || 'database.sqlite',
   },
+  domain: process.env.DOMAIN || 'https://id.voir-et-localiser.beta.gouv.fr',
+  mailjet: {
+    publicKey: process.env.MJ_APIKEY_PUBLIC,
+    privateKey: process.env.MJ_APIKEY_PRIVATE,
+  },
 };
 
 try {
