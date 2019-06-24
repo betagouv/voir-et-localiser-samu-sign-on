@@ -54,11 +54,7 @@ function redirectUser(req, res, next) {
     });
   }
 
-  return User.findAll().then(users => res.render('users/list', {
-    users,
-    loggedInUser: req.user,
-    message: 'Votre compte est en attente de validation par un administrateur.',
-  }));
+  return res.redirect('users');
 }
 
 function storeUserInSession(req, res, next) {
@@ -82,7 +78,11 @@ app.get('/', attachSessionUser, redirectUser, (req, res) => {
 app.post('/', validateUser, storeUserInSession, redirectUser);
 
 app.get('/users', attachSessionUser, (req, res) => {
-  User.findAll().then(users => res.render('users/list', { users, loggedInUser: req.user }));
+  User.findAll().then(users => res.render('users/list', {
+    users,
+    loggedInUser: req.user,
+    message: 'Votre compte est en attente de validation par un administrateur.',
+  }));
 });
 
 app.post('/logout', logout, (req, res) => {
