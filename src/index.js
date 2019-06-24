@@ -135,18 +135,14 @@ app.post('/users/new', (req, res, next) => {
           ],
         });
       request
-        .then((result) => {
-          // eslint-disable-next-line no-console
-          console.log(result.body);
+        .then(() => {
           res.render('index', {
             message: 'Un email vous a été envoyé. Merci de consulter votre boîte de réception pour confirmer votre adresse mail.',
           });
         })
         .catch((err) => {
-        // eslint-disable-next-line no-console
-          console.error(err.statusCode, err.message);
           res.render('index', {
-            message: 'Une erreur s\'est produite lors de la création de votre compte.',
+            message: `Une erreur s'est produite lors de la création de votre compte. (Code : ${err.statusCode}`,
           });
         });
     });
