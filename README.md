@@ -30,6 +30,32 @@ MJ_APIKEY_PUBLIC=xxxxxxxxxxxx
 MJ_APIKEY_PRIVATE=xxxxxxxxxxxx
 ```
 
+## Production
+
+Le fichier d'environnement /src/config/env/production.js (non versionné) :
+
+```
+domain: 'https://id.voir-et-localiser.beta.gouv.fr',
+  mailjet: {
+    publicKey: 'xxxxxxxxxxxxxxxxxxxxxxxx',
+    privateKey: 'xxxxxxxxxxxxxxxxxxxxxxxx',
+  },
+
+```
+
+## Qualif
+
+Le fichier d'environnement /src/config/env/qualif.js (non versionné) :
+
+```
+domain: 'https://qualif.id.voir-et-localiser.beta.gouv.fr',
+  mailjet: {
+    publicKey: 'xxxxxxxxxxxxxxxxxxxxxxxx',
+    privateKey: 'xxxxxxxxxxxxxxxxxxxxxxxx',
+  },
+
+```
+
 ## Déploiement
 
 Pour déployer le service en production, il faut lancer :
