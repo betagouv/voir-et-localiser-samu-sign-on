@@ -1,14 +1,12 @@
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const express = require('express');
-const dotenv = require('dotenv');
 
-const { NODE_ENV } = process.env;
+const mailjetModule = require('node-mailjet');
 
-dotenv.config();
-const mailjet = require('node-mailjet').connect(process.env.MJ_APIKEY_PUBLIC, process.env.MJ_APIKEY_PRIVATE);
+const { cookieSecret, mailjet: { publicKey, privateKey }, domain } = require('./config');
 
-const { cookieSecret } = require('./config');
+const mailjet = mailjetModule.connect(publicKey, privateKey);
 
 const {
   Token, Code, User, sequelize,
@@ -108,53 +106,50 @@ app.post('/users/new', (req, res, next) => {
     res.render('users/new', { error: e });
   });
 }, storeUserInSession, (req, res) => {
-  Token.create({ userId: req.user.id }).then((token) => {
-    let domain = '';
-    // eslint-disable-next-line no-unused-expressions
-    NODE_ENV === 'development' ? domain = process.env.DOMAIN_DEV : domain = process.env.DOMAIN_QUALIF;
-    // eslint-disable-next-line no-unused-expressions
-    NODE_ENV === 'production' ? domain = process.env.DOMAIN_PROD : domain = process.env.DOMAIN_QUALIF;
-    const link = `${domain}/confirm_mail/?token=${encodeURIComponent(token.id)}`;
-    const request = mailjet
-      .post('send', { version: 'v3.1' })
-      .request({
-        Messages: [
-          {
-            From: {
-              Email: 'id@voir-et-localiser.beta.gouv.fr',
-              Name: 'Voir et localiser',
-            },
-            To: [
-              {
-                Email: req.user.email,
-                Name: `${req.user.firstName} ${req.user.lastName}`,
+  Token.create({ userId: req.user.id }).then(token => `${domain}/confirm_mail/?token=${encodeURIComponent(token.id)}`)
+    .then((link) => {
+      const request = mailjet
+        .post('send', { version: 'v3.1' })
+        .request({
+          Messages: [
+            {
+              From: {
+                Email: 'id@voir-et-localiser.beta.gouv.fr',
+                Name: 'Voir et localiser',
               },
-            ],
-            Variables: {
-              mjLink: `${link}`,
-            },
-            Subject: 'Voir et localiser - Confirmer votre email',
-            TemplateLanguage: true,
-            TextPart: "Bonjour, bienvenue sur la brique d'authentification Voir et localiser ! Vous pouvez, dès à présent, cliquer sur le lien ci-dessus pour vous connecter !",
-            HTMLPart: "<h3>Bonjour, <br>bienvenue sur la brique d'authentification "
+              To: [
+                {
+                  Email: req.user.email,
+                  Name: `${req.user.firstName} ${req.user.lastName}`,
+                },
+              ],
+              Variables: {
+                mjLink: `${link}`,
+              },
+              Subject: 'Voir et localiser - Confirmer votre email',
+              TemplateLanguage: true,
+              TextPart: "Bonjour, bienvenue sur la brique d'authentification Voir et localiser ! Vous pouvez, dès à présent, cliquer sur le lien ci-dessus pour vous connecter !",
+              HTMLPart: "<h3>Bonjour, <br>bienvenue sur la brique d'authentification "
                 + "<a id='confirm-mail-link' href='{{var:mjLink}}'>Voir et localiser</a>.</h3><br>Vous pouvez, dès à présent, cliquer sur le lien ci-dessus pour vous connecter !",
-          },
-        ],
-      });
-    request
-      .then((result) => {
+            },
+          ],
+        });
+      request
+        .then((result) => {
+          // eslint-disable-next-line no-console
+          console.log(result.body);
+          res.render('index', {
+            message: 'Un email vous a été envoyé. Merci de consulter votre boîte de réception pour confirmer votre adresse mail.',
+          });
+        })
+        .catch((err) => {
         // eslint-disable-next-line no-console
-        console.log(result.body);
-      })
-      .catch((err) => {
-        // eslint-disable-next-line no-console
-        console.error(err.statusCode, err.message);
-      });
-
-    res.render('index', {
-      message: 'Un email vous a été envoyé. Merci de consulter votre boîte de réception pour confirmer votre adresse mail.',
+          console.error(err.statusCode, err.message);
+          res.render('index', {
+            message: 'Une erreur s\'est produite lors de la création de votre compte.',
+          });
+        });
     });
-  });
 });
 
 app.get('/confirm_mail/', (req, res) => {
