@@ -190,7 +190,45 @@ app.post('/users/validate/:id', attachSessionUser, (req, res, next) => {
       ValidatorId: req.user.id,
       isValidator: Boolean(req.body.isValidator),
     }).catch(error => res.json(error))
-      .then(() => res.redirect('/users'));
+      .then(() => {
+        const link = domain;
+        const request = mailjet
+          .post('send', { version: 'v3.1' })
+          .request({
+            Messages: [
+              {
+                From: {
+                  Email: 'contact@voir-et-localiser.beta.gouv.fr',
+                  Name: 'Voir et localiser',
+                },
+                To: [
+                  {
+                    Email: user.email,
+                    Name: `${user.firstName} ${user.lastName}`,
+                  },
+                ],
+                Variables: {
+                  mjLink: `${link}`,
+                },
+                Subject: 'Voir et localiser - Validation de votre compte',
+                TemplateLanguage: true,
+                TextPart: "Bonjour, bienvenue sur la brique d'authentification Voir et localiser ! Votre compte a été validé par un administrateur. Vous pouvez, dès à présent, cliquer sur le lien ci-dessus pour vous connecter !",
+                HTMLPart: "<h3>Bonjour, <br>bienvenue sur la brique d'authentification "
+                      + "<a id='validate-account-link' href='{{var:mjLink}}'>Voir et localiser</a>.</h3>"
+                      + '<br>Votre compte a été validé par un administrateur.'
+                      + '<br>Vous pouvez, dès à présent, cliquer sur le lien ci-dessus pour vous connecter !',
+              },
+            ],
+          });
+        request
+          .then(() => {
+            res.redirect('/users');
+          })
+          .catch((err) => {
+            app.locals.message = `Une erreur s'est produite lors de la validation de votre compte. (Code : ${err.statusCode})`;
+            res.redirect('/users');
+          });
+      });
   });
 });
 
