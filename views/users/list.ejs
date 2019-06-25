@@ -10,9 +10,7 @@
 </style>
 
 <% if(locals.message) { %>
-    <% if(loggedInUser.ValidatorId === null) { %>
-        <p class="info"><%= message %></p>
-    <% } %>
+    <p class="info"><%= message %></p>
 <% } %>
 
 <h2>Les utilisateurs de la plateforme</h2>

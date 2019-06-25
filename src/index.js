@@ -80,11 +80,11 @@ app.post('/', validateUser, storeUserInSession, redirectUser);
 app.get('/users', attachSessionUser, (req, res) => {
   User.findAll().then((users) => {
     let message = '';
-    if (!req.user.emailConfirmationTokenAt) {
-      message = 'Un email vous a été envoyé. Merci de consulter votre boîte de réception pour confirmer votre adresse mail.';
-    }
     if (!req.user.ValidatorId) {
       message = 'Votre compte est en attente de validation par un administrateur.';
+    }
+    if (!req.user.emailConfirmationTokenAt) {
+      message = 'Un email vous a été envoyé. Merci de consulter votre boîte de réception pour confirmer votre adresse mail.';
     }
     if (app.locals.message) {
       const { settings, message: messageToShow } = app.locals;
