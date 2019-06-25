@@ -154,14 +154,11 @@ app.post('/users/new', (req, res, next) => {
         });
       request
         .then(() => {
-          res.render('index', {
-            message: 'Un email vous a été envoyé. Merci de consulter votre boîte de réception pour confirmer votre adresse mail.',
-          });
+          res.redirect('/users');
         })
         .catch((err) => {
-          res.render('index', {
-            message: `Une erreur s'est produite lors de la création de votre compte. (Code : ${err.statusCode}`,
-          });
+          app.locals.message = `Une erreur s'est produite lors de la création de votre compte. (Code : ${err.statusCode})`;
+          res.redirect('/users');
         });
     });
 });
