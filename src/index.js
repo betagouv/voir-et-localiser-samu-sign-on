@@ -114,7 +114,7 @@ app.post('/users/new', (req, res, next) => {
           Messages: [
             {
               From: {
-                Email: 'id@voir-et-localiser.beta.gouv.fr',
+                Email: 'contact@voir-et-localiser.beta.gouv.fr',
                 Name: 'Voir et localiser',
               },
               To: [
