@@ -78,11 +78,25 @@ app.get('/', attachSessionUser, redirectUser, (req, res) => {
 app.post('/', validateUser, storeUserInSession, redirectUser);
 
 app.get('/users', attachSessionUser, (req, res) => {
-  User.findAll().then(users => res.render('users/list', {
-    users,
-    loggedInUser: req.user,
-    message: 'Votre compte est en attente de validation par un administrateur.',
-  }));
+  User.findAll().then((users) => {
+    let message = '';
+    if (!req.user.emailConfirmationTokenAt) {
+      message = 'Un email vous a été envoyé. Merci de consulter votre boîte de réception pour confirmer votre adresse mail.';
+    }
+    if (!req.user.ValidatorId) {
+      message = 'Votre compte est en attente de validation par un administrateur.';
+    }
+    if (app.locals.message) {
+      const { settings, message: messageToShow } = app.locals;
+      app.locals = { settings };
+      message = messageToShow;
+    }
+    res.render('users/list', {
+      users,
+      loggedInUser: req.user,
+      message,
+    });
+  });
 });
 
 app.post('/logout', logout, (req, res) => {
