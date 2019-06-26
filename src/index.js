@@ -1,12 +1,8 @@
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const express = require('express');
-
-const mailjetModule = require('node-mailjet');
-
-const { cookieSecret, mailjet: { publicKey, privateKey }, domain } = require('./config');
-
-const mailjet = mailjetModule.connect(publicKey, privateKey);
+const { cookieSecret, domain } = require('./config');
+const { request } = require('./services/confirm-mail');
 
 const {
   Token, Code, User, sequelize,
@@ -138,33 +134,8 @@ app.post('/users/new', (req, res, next) => {
 }, storeUserInSession, (req, res) => {
   Token.create({ userId: req.user.id }).then(token => `${domain}/confirm_mail/?token=${encodeURIComponent(token.id)}`)
     .then((link) => {
-      const request = mailjet
-        .post('send', { version: 'v3.1' })
-        .request({
-          Messages: [
-            {
-              From: {
-                Email: 'contact@voir-et-localiser.beta.gouv.fr',
-                Name: 'Voir et localiser',
-              },
-              To: [
-                {
-                  Email: req.user.email,
-                  Name: `${req.user.firstName} ${req.user.lastName}`,
-                },
-              ],
-              Variables: {
-                mjLink: `${link}`,
-              },
-              Subject: 'Voir et localiser - Confirmer votre email',
-              TemplateLanguage: true,
-              TextPart: "Bonjour, bienvenue sur la brique d'authentification Voir et localiser ! Vous pouvez, dès à présent, cliquer sur le lien ci-dessus pour vous connecter !",
-              HTMLPart: "<h3>Bonjour, <br>bienvenue sur la brique d'authentification "
-                + "<a id='confirm-mail-link' href='{{var:mjLink}}'>Voir et localiser</a>.</h3><br>Vous pouvez, dès à présent, cliquer sur le lien ci-dessus pour vous connecter !",
-            },
-          ],
-        });
-      request
+      const mailjetRequest = request(req.user, link);
+      mailjetRequest
         .then(() => {
           res.redirect('/users');
         })
