@@ -33,7 +33,7 @@
 <form method="post">
   <div>
     <label for="email">Email&nbsp;:</label>
-    <input id="email" name="email">
+    <input id="email" name="email" value="<%= email %>">
   </div>
   <div>
     <label for="password">Mot de passe&nbsp;:</label>
@@ -41,35 +41,48 @@
   </div>
   <div>
     <label for="firstName">Prénom&nbsp;:</label>
-    <input id="firstName" name="firstName">
+    <input id="firstName" name="firstName" value="<%= firstName %>">
   </div>
   <div>
     <label for="lastName">Nom&nbsp;:</label>
-    <input id="lastName" name="lastName">
+    <input id="lastName" name="lastName" value="<%= lastName %>">
   </div>
   <div>
     <label for="role">Rôle :</label>
     <select id="role" name="role">
-      <option value="ROLE_OPERATOR">Opérateur local</option>
-      <option value="ROLE_ADMIN_D" selected>Admin local</option>
-      <option value="ROLE_ADMIN_N">Admin national</option>
+      <%
+        const roleOptions = [
+          { value: 'ROLE_OPERATOR', optionText: 'Opérateur local' },
+          { value: 'ROLE_ADMIN_D', optionText: 'Admin local' },
+          { value: 'ROLE_ADMIN_N', optionText: 'Admin national' }
+        ];
+        roleOptions.forEach(roleOption => {
+        %><option value="<%=roleOption.value %>" <%= roleOption.value === role ? 'selected' : '' %>  <%= role === '' ? 'selected' : '' %>><%=roleOption.optionText %></option><%
+        })
+      %>
     </select>
   </div>
   <div>
     <label for="unit">Unité :</label>
     <select id="unit" name="unit">
-      <option value="SAMU">SAMU</option>
-      <option value="ST(SI)²">ST(SI)²</option>
-      <option value="Sécurité Civile">Sécurité Civile</option>
-      <option value="DINSIC">DINSIC</option>
+      <%
+        const unitOptions = ['SAMU', 'ST(SI)²', 'Sécurité Civile', 'DINSIC' ];
+        unitOptions.forEach(value => {
+        %><option value="<%=value %>" <%= value === unit ? 'selected' : '' %>><%=value %></option><%
+        })
+      %>
     </select>
   </div>
 
   <div>
     <label for="department">Départment :</label>
     <select id="department" name="department">
-      <option value="85">85</option>
-      <option value="France entière">France entière</option>
+      <%
+        const departmentOptions = ['85', 'France entière'];
+        departmentOptions.forEach(value => {
+          %><option value="<%=value %>" <%= value === department ? 'selected' : '' %>><%=value %></option><%
+        })
+      %>
     </select>
   </div>
   <button type="submit">Créer un compte</button>
