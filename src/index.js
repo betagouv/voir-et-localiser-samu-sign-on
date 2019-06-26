@@ -86,11 +86,6 @@ app.get('/users', attachSessionUser, (req, res) => {
     if (!req.user.emailConfirmationTokenAt) {
       message = 'Un email vous a été envoyé. Merci de consulter votre boîte de réception pour confirmer votre adresse mail.';
     }
-    if (app.locals.message) {
-      const { settings, message: messageToShow } = app.locals;
-      app.locals = { settings };
-      message = messageToShow;
-    }
     res.render('users/list', {
       users,
       loggedInUser: req.user,
@@ -104,7 +99,24 @@ app.post('/logout', logout, (req, res) => {
 });
 
 app.get('/users/new', (req, res) => {
-  res.render('users/new');
+  if (Object.keys(req.body).length === 0) {
+    req.body = {
+      email: '',
+      firstName: '',
+      lastName: '',
+      role: '',
+      unit: '',
+      department: '',
+    };
+  }
+  res.render('users/new', {
+    email: req.body.email,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    role: req.body.role,
+    unit: req.body.unit,
+    department: req.body.department,
+  });
 });
 
 app.post('/users/new', (req, res, next) => {
@@ -121,7 +133,7 @@ app.post('/users/new', (req, res, next) => {
   }).then(() => {
     next();
   }).catch((e) => {
-    res.render('users/new', { error: e });
+    res.render('users/new', { error: e, ...req.body });
   });
 }, storeUserInSession, (req, res) => {
   Token.create({ userId: req.user.id }).then(token => `${domain}/confirm_mail/?token=${encodeURIComponent(token.id)}`)
@@ -157,8 +169,10 @@ app.post('/users/new', (req, res, next) => {
           res.redirect('/users');
         })
         .catch((err) => {
-          app.locals.message = `Une erreur s'est produite lors de la création de votre compte. (Code : ${err.statusCode})`;
-          res.redirect('/users');
+          res.render('users/new', {
+            error: `Une erreur s'est produite lors de la création de votre compte. (Code : ${err.statusCode})`,
+            ...req.body,
+          });
         });
     });
 });
