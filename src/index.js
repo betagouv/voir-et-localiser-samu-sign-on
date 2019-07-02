@@ -148,6 +148,30 @@ app.post('/users/new', (req, res, next) => {
     });
 });
 
+app.get('/users/update/:id', (req, res) => {
+  res.render('users/update', { user: { id: req.params.id } });
+});
+
+app.post('/users/update/:id', attachSessionUser, (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'Vous devez être connecté.' });
+  }
+
+  if (!req.user.isValidator) {
+    return res.status(401).send({ error: 'Vous devez être validateur.' });
+  }
+
+  return next();
+}, (req, res) => {
+  User.update({
+    password: req.body.password,
+  }, {
+    where: {
+      id: req.params.id,
+    },
+  }).then(() => res.redirect('/users'));
+});
+
 app.get('/confirm_mail/', (req, res) => {
   Token.findOne({
     where: {
