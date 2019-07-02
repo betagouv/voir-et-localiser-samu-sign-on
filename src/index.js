@@ -163,6 +163,10 @@ app.post('/users/update/:id', attachSessionUser, (req, res, next) => {
 
   return next();
 }, (req, res) => {
+  if (req.body.password !== req.body.passwordConfirmation) {
+    return res.render('users/update', { user: req.user, error: 'Vous devez saisir un mot de passe identique pour la confirmation.' });
+  }
+
   User.update({
     password: req.body.password,
   }, {
