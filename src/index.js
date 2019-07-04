@@ -141,7 +141,7 @@ app.post('/users/new', (req, res, next) => {
         })
         .catch((err) => {
           res.render('users/new', {
-            error: `Une erreur s'est produite lors de la création de votre compte. (Code : ${err.statusCode})`,
+            error: `Une erreur s'est produite lors de la confirmation de votre compte. (Code : ${err.statusCode})`,
             ...req.body,
           });
         });

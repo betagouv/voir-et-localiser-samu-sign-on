@@ -53,8 +53,8 @@
       <%
         const roleOptions = [
           { value: 'ROLE_OPERATOR', optionText: 'Opérateur local' },
-          { value: 'ROLE_ADMIN_D', optionText: 'Admin local' },
-          { value: 'ROLE_ADMIN_N', optionText: 'Admin national' }
+          { value: 'ROLE_ADMIN_N', optionText: 'Admin national' },
+          { value: 'ROLE_ADMIN_D', optionText: 'Admin local' }
         ];
         roleOptions.forEach(roleOption => {
         %><option value="<%=roleOption.value %>" <%= roleOption.value === role ? 'selected' : '' %>  <%= role === '' ? 'selected' : '' %>><%=roleOption.optionText %></option><%
