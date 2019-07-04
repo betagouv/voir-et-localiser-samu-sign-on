@@ -1,12 +1,8 @@
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const express = require('express');
-
-const mailjetModule = require('node-mailjet');
-
-const { cookieSecret, mailjet: { publicKey, privateKey }, domain } = require('./config');
-
-const mailjet = mailjetModule.connect(publicKey, privateKey);
+const { cookieSecret, domain } = require('./config');
+const { request } = require('./services/confirm-mail');
 
 const {
   Token, Code, User, sequelize,
@@ -78,7 +74,20 @@ app.get('/', attachSessionUser, redirectUser, (req, res) => {
 app.post('/', validateUser, storeUserInSession, redirectUser);
 
 app.get('/users', attachSessionUser, (req, res) => {
-  User.findAll().then(users => res.render('users/list', { users, loggedInUser: req.user }));
+  User.findAll().then((users) => {
+    let message = '';
+    if (!req.user.ValidatorId) {
+      message = 'Votre compte est en attente de validation par un administrateur.';
+    }
+    if (!req.user.emailConfirmationTokenAt) {
+      message = 'Un email vous a été envoyé. Merci de consulter votre boîte de réception pour confirmer votre adresse mail.';
+    }
+    res.render('users/list', {
+      users,
+      loggedInUser: req.user,
+      message,
+    });
+  });
 });
 
 app.post('/logout', logout, (req, res) => {
@@ -86,7 +95,24 @@ app.post('/logout', logout, (req, res) => {
 });
 
 app.get('/users/new', (req, res) => {
-  res.render('users/new');
+  if (Object.keys(req.body).length === 0) {
+    req.body = {
+      email: '',
+      firstName: '',
+      lastName: '',
+      role: '',
+      unit: '',
+      department: '',
+    };
+  }
+  res.render('users/new', {
+    email: req.body.email,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    role: req.body.role,
+    unit: req.body.unit,
+    department: req.body.department,
+  });
 });
 
 app.post('/users/new', (req, res, next) => {
@@ -103,46 +129,20 @@ app.post('/users/new', (req, res, next) => {
   }).then(() => {
     next();
   }).catch((e) => {
-    res.render('users/new', { error: e });
+    res.render('users/new', { error: e, ...req.body });
   });
 }, storeUserInSession, (req, res) => {
   Token.create({ userId: req.user.id }).then(token => `${domain}/confirm_mail/?token=${encodeURIComponent(token.id)}`)
     .then((link) => {
-      const request = mailjet
-        .post('send', { version: 'v3.1' })
-        .request({
-          Messages: [
-            {
-              From: {
-                Email: 'contact@voir-et-localiser.beta.gouv.fr',
-                Name: 'Voir et localiser',
-              },
-              To: [
-                {
-                  Email: req.user.email,
-                  Name: `${req.user.firstName} ${req.user.lastName}`,
-                },
-              ],
-              Variables: {
-                mjLink: `${link}`,
-              },
-              Subject: 'Voir et localiser - Confirmer votre email',
-              TemplateLanguage: true,
-              TextPart: "Bonjour, bienvenue sur la brique d'authentification Voir et localiser ! Vous pouvez, dès à présent, cliquer sur le lien ci-dessus pour vous connecter !",
-              HTMLPart: "<h3>Bonjour, <br>bienvenue sur la brique d'authentification "
-                + "<a id='confirm-mail-link' href='{{var:mjLink}}'>Voir et localiser</a>.</h3><br>Vous pouvez, dès à présent, cliquer sur le lien ci-dessus pour vous connecter !",
-            },
-          ],
-        });
-      request
+      const mailjetRequest = request(req.user, link);
+      mailjetRequest
         .then(() => {
-          res.render('index', {
-            message: 'Un email vous a été envoyé. Merci de consulter votre boîte de réception pour confirmer votre adresse mail.',
-          });
+          res.redirect('/users');
         })
         .catch((err) => {
-          res.render('index', {
-            message: `Une erreur s'est produite lors de la création de votre compte. (Code : ${err.statusCode}`,
+          res.render('users/new', {
+            error: `Une erreur s'est produite lors de la confirmation de votre compte. (Code : ${err.statusCode})`,
+            ...req.body,
           });
         });
     });
