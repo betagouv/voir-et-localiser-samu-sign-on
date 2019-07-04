@@ -157,10 +157,6 @@ app.post('/users/update/:id', attachSessionUser, (req, res, next) => {
     return res.status(401).send({ error: 'Vous devez être connecté.' });
   }
 
-  if (!req.user.isValidator) {
-    return res.status(401).send({ error: 'Vous devez être validateur.' });
-  }
-
   return next();
 }, (req, res) => {
   if (req.body.password !== req.body.passwordConfirmation) {
