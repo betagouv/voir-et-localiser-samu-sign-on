@@ -9,6 +9,53 @@ npm run dev
 # Aller à http://localhost:10101
 ```
 
+Configuration BDD :
+
+Instruction avec variable
+
+```
+DATABASE_SQLITE_FILE=../db_id_voir_et_localiser.db npm run dev
+```
+
+Ou variable d'environnement
+
+```
+DATABASE_SQLITE_FILE=../db_id_voir_et_localiser.db
+```
+
+Configuration des variables d'environnement Mail jet
+
+```
+MJ_APIKEY_PUBLIC=xxxxxxxxxxxx
+MJ_APIKEY_PRIVATE=xxxxxxxxxxxx
+```
+
+## Production
+
+Le fichier d'environnement /src/config/env/production.js (non versionné) :
+
+```
+domain: 'https://id.voir-et-localiser.beta.gouv.fr',
+  mailjet: {
+    publicKey: 'xxxxxxxxxxxxxxxxxxxxxxxx',
+    privateKey: 'xxxxxxxxxxxxxxxxxxxxxxxx',
+  },
+
+```
+
+## Qualif
+
+Le fichier d'environnement /src/config/env/qualif.js (non versionné) :
+
+```
+domain: 'https://qualif.id.voir-et-localiser.beta.gouv.fr',
+  mailjet: {
+    publicKey: 'xxxxxxxxxxxxxxxxxxxxxxxx',
+    privateKey: 'xxxxxxxxxxxxxxxxxxxxxxxx',
+  },
+
+```
+
 ## Déploiement
 
 Pour déployer le service en production, il faut lancer :
