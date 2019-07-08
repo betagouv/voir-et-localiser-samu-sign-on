@@ -194,6 +194,85 @@ app.post('/users/validate/:id', attachSessionUser, (req, res, next) => {
   });
 });
 
+app.get('/users/password/new', (req, res) => {
+  res.render('users/reset');
+});
+
+app.post('/users/password/new', (req, res) => {
+  User.findOne({
+    where: {
+      email: req.body.email,
+    },
+  }).then((user) => {
+    Token.create({ userId: user.id }).then(token => `${domain}/confirm_mail_reset/?token=${encodeURIComponent(token.id)}`)
+      .then((link) => {
+        const request = mailjet
+          .post('send', { version: 'v3.1' })
+          .request({
+            Messages: [
+              {
+                From: {
+                  Email: 'contact@voir-et-localiser.beta.gouv.fr',
+                  Name: 'Voir et localiser',
+                },
+                To: [
+                  {
+                    Email: user.email,
+                    Name: `${user.firstName} ${user.lastName}`,
+                  },
+                ],
+                Variables: {
+                  mjLink: `${link}`,
+                },
+                Subject: 'Voir et localiser - Réinitialiser votre email',
+                TemplateLanguage: true,
+                TextPart: "Bonjour, vous avez demandé la réinitialisation de votre mot de passe sur la brique d'authentification Voir et localiser ! Vous pouvez, dès à présent, cliquer sur le lien ci-dessus pour vous saisir un nouveau mot de passe !",
+                HTMLPart: "<h3>Bonjour, <br>vous avez demandé la réinitialisation de votre mot de passe sur la brique d'authentification "
+                        + "<a id='confirm-mail-reset-link' href='{{var:mjLink}}'>Voir et localiser</a>.</h3><br>Vous pouvez, dès à présent, cliquer sur le lien ci-dessus pour vous saisir un nouveau mot de passe !",
+              },
+            ],
+          });
+        request
+          .then(() => res.render('users/reset')
+            .catch(() => res.render('users/reset', { error: 'Email inconnu.' })));
+      });
+  });
+});
+
+app.get('/confirm_mail_reset/', (req, res) => {
+  Token.findOne({
+    where: {
+      id: Buffer.from(req.query.token, 'base64'),
+    },
+  }).then((token) => {
+    if (!token) {
+      return res.status(404).send({ error: 'Token inconnu' });
+    }
+
+    res.render('users/reset_password', { user: { id: token.userId } });
+  });
+});
+
+app.post('/confirm_mail_reset/', attachSessionUser, (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'Vous devez être connecté.' });
+  }
+
+  return next();
+}, (req, res) => {
+  if (req.body.password !== req.body.passwordConfirmation) {
+    return res.render('users/reset_password', { user: req.user, error: 'Vous devez saisir un mot de passe identique pour la confirmation.' });
+  }
+
+  User.update({
+    password: req.body.password,
+  }, {
+    where: {
+      id: req.user.id,
+    },
+  }).then(() => res.redirect('/users'));
+});
+
 function getToken(req, res, next) {
   const header = req.get('Authorization');
   if (!header) {

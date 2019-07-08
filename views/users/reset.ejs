@@ -1,0 +1,44 @@
+<% if(locals.message) { %>
+  <p class="info"><%= message %></p>
+<% } %>
+
+<h1 class="main">Mot de passe oublié</h1>
+
+<style type="text/css">
+  /* From https://jrl.ninja/etc/1/ */
+  body {
+    max-width: 20rem;
+    padding: 2rem;
+    margin: auto;
+  }
+
+  .warning {
+    padding: 0.2em;
+    background-color: #ffbb78
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  form > * {
+    display: flex;
+    flex-direction: column;
+    padding: 0.2em;
+  }
+</style>
+
+<% if(locals.error) { %>
+  <p class="warning"><%= error %></p>
+<% } %>
+
+<form class="main" method="post">
+  <div>
+    <label for="email">Email&nbsp;:</label>
+    <input id="email" name="email">
+  </div>
+
+  <button type="submit">Réinitialiser mon mot de passe</button>
+</form>
