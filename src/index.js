@@ -233,8 +233,8 @@ app.post('/users/password/new', (req, res) => {
             ],
           });
         request
-          .then(() => res.render('users/reset')
-            .catch(() => res.render('users/reset', { error: 'Email inconnu.' })));
+          .then(() => res.render('users/reset', { message: 'Un email vous a été envoyé. Merci de consulter votre boîte de réception pour réinitialiser votre mot de passe.' }))
+          .catch(() => res.render('users/reset', { error: 'Email inconnu.' }));
       });
   });
 });
@@ -253,24 +253,24 @@ app.get('/confirm_mail_reset/', (req, res) => {
   });
 });
 
-app.post('/confirm_mail_reset/', attachSessionUser, (req, res, next) => {
-  if (!req.user) {
-    return res.status(401).send({ error: 'Vous devez être connecté.' });
-  }
-
-  return next();
-}, (req, res) => {
+app.post('/confirm_mail_reset/', attachSessionUser, (req, res) => {
   if (req.body.password !== req.body.passwordConfirmation) {
     return res.render('users/reset_password', { user: req.user, error: 'Vous devez saisir un mot de passe identique pour la confirmation.' });
   }
 
-  User.update({
-    password: req.body.password,
-  }, {
+  Token.findOne({
     where: {
-      id: req.user.id,
+      id: Buffer.from(req.query.token, 'base64'),
     },
-  }).then(() => res.redirect('/users'));
+  }).then((token) => {
+    User.update({
+      password: req.body.password,
+    }, {
+      where: {
+        id: token.userId,
+      },
+    }).then(() => res.redirect('/users'));
+  });
 });
 
 function getToken(req, res, next) {
