@@ -47,6 +47,11 @@
                             <button class="warning">Autoriser à valider</button>
                         </form>
                     </td>
+                    <td>
+                        <form method="post" action="/users/delete/<%= user.id %>">
+                            <button class="warning">Supprimer</button>
+                        </form>
+                    </td>
                 <% } else {%>
                     <td><%= user.ValidatorId %></td>
                 <% } %>

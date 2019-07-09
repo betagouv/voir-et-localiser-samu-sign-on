@@ -71,6 +71,14 @@ function logout(req, res, next) {
   return next();
 }
 
+function formatCurrentDateForSQLiteDate() {
+  const currentDate = new Date().toISOString();
+  return `${currentDate.replace('T', ' ').replace('Z', '')} +00:00`;
+}
+function getSQLiteDate() {
+  return new Date(formatCurrentDateForSQLiteDate());
+}
+
 app.get('/', attachSessionUser, redirectUser, (req, res) => {
   res.render('index');
 });
@@ -78,7 +86,10 @@ app.get('/', attachSessionUser, redirectUser, (req, res) => {
 app.post('/', validateUser, storeUserInSession, redirectUser);
 
 app.get('/users', attachSessionUser, (req, res) => {
-  User.findAll().then(users => res.render('users/list', { users, loggedInUser: req.user }));
+  User.findAll().then((allTheUsers) => {
+    const users = allTheUsers.filter(user => user.deletedAt === null);
+    res.render('users/list', { users, loggedInUser: req.user });
+  });
 });
 
 app.post('/logout', logout, (req, res) => {
@@ -192,6 +203,28 @@ app.post('/users/validate/:id', attachSessionUser, (req, res, next) => {
     }).catch(error => res.json(error))
       .then(() => res.redirect('/users'));
   });
+});
+
+app.post('/users/delete/:id', attachSessionUser, (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'Vous devez être connecté.' });
+  }
+
+  if (!req.user.isValidator) {
+    return res.status(401).send({ error: 'Vous devez être validateur.' });
+  }
+
+  return next();
+}, (req, res) => {
+  const validDate = getSQLiteDate();
+  User.update({
+    deletedAt: validDate,
+  }, {
+    where: {
+      id: req.params.id,
+    },
+  }).catch(error => res.json(error))
+    .then(() => res.redirect('/users'));
 });
 
 function getToken(req, res, next) {
