@@ -41,14 +41,16 @@
                             <button>Valider</button>
                         </form>
                     </td>
+                <% } else {%>
+                    <td><%= user.ValidatorId %></td>
+                <% } %>
+                <% if (!user.isValidator) { %>
                     <td>
                         <form method="post" action="/users/validate/<%= user.id %>">
                             <input type="hidden" name="isValidator" value="1">
                             <button class="warning">Autoriser à valider</button>
                         </form>
                     </td>
-                <% } else {%>
-                    <td><%= user.ValidatorId %></td>
                 <% } %>
             <% } %>
         </tr>
