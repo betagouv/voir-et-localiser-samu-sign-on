@@ -78,7 +78,11 @@ app.get('/', attachSessionUser, redirectUser, (req, res) => {
 app.post('/', validateUser, storeUserInSession, redirectUser);
 
 app.get('/users', attachSessionUser, (req, res) => {
-  User.findAll().then(users => res.render('users/list', { users, loggedInUser: req.user }));
+  let message = '';
+  if (req.headers.referer !== undefined && req.headers.referer.includes('?token')) {
+    message = 'Votre mot de passe a bien été réinitialisé. Vous pouvez dès à présent vous connecter.';
+  }
+  User.findAll().then(users => res.render('users/list', { users, loggedInUser: req.user, message }));
 });
 
 app.post('/logout', logout, (req, res) => {
@@ -253,7 +257,7 @@ app.get('/confirm_mail_reset/', (req, res) => {
   });
 });
 
-app.post('/confirm_mail_reset/', attachSessionUser, (req, res) => {
+app.post('/confirm_mail_reset/', (req, res) => {
   if (req.body.password !== req.body.passwordConfirmation) {
     return res.render('users/reset_password', { user: req.user, error: 'Vous devez saisir un mot de passe identique pour la confirmation.' });
   }
@@ -269,7 +273,8 @@ app.post('/confirm_mail_reset/', attachSessionUser, (req, res) => {
       where: {
         id: token.userId,
       },
-    }).then(() => res.redirect('/users'));
+    }).catch(err => res.json(err.message))
+      .then(() => res.redirect('/users'));
   });
 });
 
