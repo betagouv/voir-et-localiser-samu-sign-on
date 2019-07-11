@@ -78,7 +78,11 @@ app.get('/', attachSessionUser, redirectUser, (req, res) => {
 app.post('/', validateUser, storeUserInSession, redirectUser);
 
 app.get('/users', attachSessionUser, (req, res) => {
-  User.findAll().then(users => res.render('users/list', { users, loggedInUser: req.user }));
+  let message = '';
+  if (req.headers.referer !== undefined && req.headers.referer.includes('update')) {
+    message = 'Votre mot de passe a bien été mis à jour.';
+  }
+  User.findAll().then(users => res.render('users/list', { users, loggedInUser: req.user, message }));
 });
 
 app.post('/logout', logout, (req, res) => {
