@@ -78,7 +78,11 @@ app.get('/', attachSessionUser, redirectUser, (req, res) => {
 app.post('/', validateUser, storeUserInSession, redirectUser);
 
 app.get('/users', attachSessionUser, (req, res) => {
-  User.findAll().then(users => res.render('users/list', { users, loggedInUser: req.user }));
+  let message = '';
+  if (req.headers.referer !== undefined && req.headers.referer.includes('update')) {
+    message = 'Votre mot de passe a bien été mis à jour.';
+  }
+  User.findAll().then(users => res.render('users/list', { users, loggedInUser: req.user, message }));
 });
 
 app.post('/logout', logout, (req, res) => {
@@ -146,6 +150,30 @@ app.post('/users/new', (req, res, next) => {
           });
         });
     });
+});
+
+app.get('/users/update/:id', (req, res) => {
+  res.render('users/update', { user: { id: req.params.id } });
+});
+
+app.post('/users/update/:id', attachSessionUser, (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).send({ error: 'Vous devez être connecté.' });
+  }
+
+  return next();
+}, (req, res) => {
+  if (req.body.password !== req.body.passwordConfirmation) {
+    return res.render('users/update', { user: req.user, error: 'Vous devez saisir un mot de passe identique pour la confirmation.' });
+  }
+
+  User.update({
+    password: req.body.password,
+  }, {
+    where: {
+      id: req.params.id,
+    },
+  }).then(() => res.redirect('/users'));
 });
 
 app.get('/confirm_mail/', (req, res) => {

@@ -3,6 +3,10 @@
     <ul>
         <li>Vous êtes connecté(e) en tant que <%= loggedInUser.firstName %> <%= loggedInUser.lastName %>.</li>
         <li>
+            <form method="get" action="/users/update/<%= loggedInUser.id %>">
+                <button>Modifier son mot de passe</button>
+            </form>
+        </li><li>
             <form method="post" action="/logout">
                 <button>Se déconnecter</button>
             </form>
