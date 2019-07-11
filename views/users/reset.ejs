@@ -1,4 +1,8 @@
-<h1>Bienvenue</h1>
+<% if(locals.message) { %>
+  <p class="info"><%= message %></p>
+<% } %>
+
+<h1 class="main">Mot de passe oublié</h1>
 
 <style type="text/css">
   /* From https://jrl.ninja/etc/1/ */
@@ -35,21 +39,11 @@
   <p class="warning"><%= error %></p>
 <% } %>
 
-<% if(locals.message) { %>
-  <p class="info"><%= message %></p>
-<% } %>
+<form class="main" method="post">
+  <div>
+    <label for="email">Email&nbsp;:</label>
+    <input id="email" name="email">
+  </div>
 
-<form method="post">
-  <div>
-    <label for="username">Email&nbsp;:</label>
-    <input id="username" name="username">
-  </div>
-  <div>
-    <label for="password">Mot de passe&nbsp;:</label>
-    <input id="password" name="password" type="password">
-  </div>
-  <button type="submit">Se connecter</button>
+  <button type="submit">Réinitialiser mon mot de passe</button>
 </form>
-
-<a href="/users/new">Créer un compte</a>
-<a href="/users/password/new">Mot de passe oublié</a>
